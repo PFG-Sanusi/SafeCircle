@@ -57,6 +57,7 @@ app.use('/api/sos', sosRoutes);
 app.use('/api/emergency-contacts', emergencyContactRoutes);
 
 // Socket.IO for real-time location tracking
+// Note: In a production environment with multiple instances, use Redis adapter
 const activeUsers = new Map(); // userId -> socketId
 
 io.on('connection', (socket) => {
@@ -238,6 +239,12 @@ io.on('connection', (socket) => {
 
 // Helper: Send FCM notification
 async function sendFCMNotification(fcmToken, payload) {
+    // Skip if no server key provided
+    if (!process.env.FCM_SERVER_KEY) {
+        console.log('FCM_SERVER_KEY not set, skipping push notification');
+        return;
+    }
+
     const axios = require('axios');
 
     try {
@@ -261,23 +268,29 @@ async function sendFCMNotification(fcmToken, payload) {
     }
 }
 
-// Helper: Send SMS (Africa's Talking)
+// Helper: Send SMS (Africa's Talking implementation)
 async function sendSMS(phoneNumber, message) {
-    // This is a placeholder - implement based on your SMS provider
-    // Example for Africa's Talking:
-    /*
-    const AfricasTalking = require('africastalking')({
-        apiKey: process.env.AT_API_KEY,
-        username: process.env.AT_USERNAME
-    });
-    
-    const sms = AfricasTalking.SMS;
-    await sms.send({
-        to: [phoneNumber],
-        message: message
-    });
-    */
-    console.log(`SMS to ${phoneNumber}: ${message}`);
+    // Skip if credentials not provided
+    if (!process.env.AT_API_KEY || !process.env.AT_USERNAME) {
+        console.log(`SMS simulation to ${phoneNumber}: ${message}`);
+        return;
+    }
+
+    try {
+        const AfricasTalking = require('africastalking')({
+            apiKey: process.env.AT_API_KEY,
+            username: process.env.AT_USERNAME
+        });
+        
+        const sms = AfricasTalking.SMS;
+        await sms.send({
+            to: [phoneNumber],
+            message: message
+        });
+        console.log(`SMS sent successfully to ${phoneNumber}`);
+    } catch (error) {
+        console.error('SMS sending error:', error);
+    }
 }
 
 // Error handling middleware

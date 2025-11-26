@@ -1,8 +1,10 @@
 import axios from 'axios';
 import Constants from 'expo-constants';
 
-// Get API URL from app config
-const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3000';
+// Get API URL from app config or fallback to localhost for simulators
+// For physical devices, this MUST be your computer's local IP address (e.g., 192.168.1.5:3000)
+// You can set this in app.config.js under "extra"
+const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://192.168.43.204:3000';
 
 // Create axios instance
 const api = axios.create({
@@ -41,6 +43,7 @@ api.interceptors.response.use(
         } else if (error.request) {
             // Request was made but no response
             console.error('Network Error:', error.message);
+            console.error('Target URL:', `${API_URL}/api`);
         } else {
             // Something else happened
             console.error('Error:', error.message);

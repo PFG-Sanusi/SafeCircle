@@ -14,7 +14,7 @@ export default {
             infoPlist: {
                 NSLocationWhenInUseUsageDescription: "SafeCircle needs your location to share it with your safety contacts.",
                 NSLocationAlwaysAndWhenInUseUsageDescription: "SafeCircle needs your location in the background to keep you safe.",
-                UIBackgroundModes: ["location"]
+                UIBackgroundModes: ["location", "fetch", "remote-notification"]
             }
         },
         android: {
@@ -22,7 +22,10 @@ export default {
             permissions: [
                 "ACCESS_COARSE_LOCATION",
                 "ACCESS_FINE_LOCATION",
-                "FOREGROUND_SERVICE"
+                "ACCESS_BACKGROUND_LOCATION",
+                "FOREGROUND_SERVICE",
+                "VIBRATE",
+                "RECEIVE_BOOT_COMPLETED"
             ]
         },
         extra: {
@@ -32,10 +35,16 @@ export default {
             [
                 "expo-location",
                 {
-                    "locationAlwaysAndWhenInUsePermission": "Allow SafeCircle to use your location."
+                    "locationAlwaysAndWhenInUsePermission": "Allow SafeCircle to use your location to keep you safe even when the app is closed."
+                }
+            ],
+            [
+                "expo-notifications",
+                {
+                    "icon": "./assets/icon.png",
+                    "color": "#ffffff"
                 }
             ]
         ]
     }
 };
-

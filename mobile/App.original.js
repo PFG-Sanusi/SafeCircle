@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Platform, View, Text, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -115,21 +116,35 @@ export default function App() {
     useEffect(() => {
         async function prepare() {
             try {
-                // Request location permissions
-                const { status } = await Location.requestForegroundPermissionsAsync();
-                if (status !== 'granted') {
-                    console.warn('Location permission not granted');
-                }
+                // Add a timeout to ensure we don't hang forever
+                const timeout = new Promise(resolve => setTimeout(resolve, 3000));
 
-                // Request notification permissions
-                const { status: notifStatus } = await Notifications.requestPermissionsAsync();
-                if (notifStatus !== 'granted') {
-                    console.warn('Notification permission not granted');
-                }
+                const permissions = async () => {
+                    if (Platform.OS === 'web') {
+                        // On web, we can't block for permissions on mount as it might hang
+                        console.log('Web platform detected, skipping blocking permissions');
+                        return;
+                    }
 
-                setIsReady(true);
+                    // Request location permissions
+                    const { status } = await Location.requestForegroundPermissionsAsync();
+                    if (status !== 'granted') {
+                        console.warn('Location permission not granted');
+                    }
+
+                    // Request notification permissions
+                    const { status: notifStatus } = await Notifications.requestPermissionsAsync();
+                    if (notifStatus !== 'granted') {
+                        console.warn('Notification permission not granted');
+                    }
+                };
+
+                // Race between permissions and timeout
+                await Promise.race([permissions(), timeout]);
+
             } catch (error) {
                 console.error('App preparation error:', error);
+            } finally {
                 setIsReady(true);
             }
         }
@@ -138,7 +153,12 @@ export default function App() {
     }, []);
 
     if (!isReady) {
-        return null; // Show splash screen
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" color="#FF6B6B" />
+                <Text style={{ marginTop: 20 }}>Starting SafeCircle...</Text>
+            </View>
+        );
     }
 
     return (

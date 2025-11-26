@@ -13,7 +13,7 @@ export const useSocket = () => {
     return context;
 };
 
-const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3000';
+const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://192.168.43.204:3000';
 
 export const SocketProvider = ({ children }) => {
     const { user, token } = useAuth();

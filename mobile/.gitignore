@@ -18,6 +18,8 @@ web-build/
 *.key
 *.mobileprovision
 *.cer
+google-services.json
+GoogleService-Info.plist
 
 # Metro
 .metro-health-check*

@@ -7,9 +7,10 @@ import {
     Text,
     Alert,
     Dimensions,
-    ActivityIndicator
+    ActivityIndicator,
+    Platform
 } from 'react-native';
-import MapView, { Marker, Circle, PROVIDER_DEFAULT } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
@@ -23,13 +24,13 @@ export default function MapScreen({ navigation }) {
     const { user } = useAuth();
     const { socket } = useSocket();
     const { currentLocation, startTracking, stopTracking } = useLocation();
-    
+
     const [isTracking, setIsTracking] = useState(false);
     const [nearbyUsers, setNearbyUsers] = useState([]);
     const [connectedUsers, setConnectedUsers] = useState([]);
     const [showSOS, setShowSOS] = useState(false);
     const [isLoadingLocation, setIsLoadingLocation] = useState(true);
-    
+
     const mapRef = useRef(null);
 
     // Initial location setup
@@ -48,9 +49,9 @@ export default function MapScreen({ navigation }) {
                 });
 
                 setIsLoadingLocation(false);
-                
+
                 // Center map on user location
-                if (mapRef.current) {
+                if (mapRef.current && Platform.OS !== 'web') {
                     mapRef.current.animateToRegion({
                         latitude: location.coords.latitude,
                         longitude: location.coords.longitude,
@@ -79,10 +80,10 @@ export default function MapScreen({ navigation }) {
     // Fetch connected users' locations
     useEffect(() => {
         fetchConnectedUsersLocations();
-        
+
         // Refresh every 30 seconds
         const interval = setInterval(fetchConnectedUsersLocations, 30000);
-        
+
         return () => clearInterval(interval);
     }, []);
 
@@ -93,8 +94,8 @@ export default function MapScreen({ navigation }) {
         socket.on('location_updated', (data) => {
             // Update connected users list with new location
             setConnectedUsers(prev => {
-                const updated = prev.map(u => 
-                    u.userId === data.userId 
+                const updated = prev.map(u =>
+                    u.userId === data.userId
                         ? { ...u, latitude: data.latitude, longitude: data.longitude }
                         : u
                 );
@@ -111,7 +112,7 @@ export default function MapScreen({ navigation }) {
                     {
                         text: 'View Location',
                         onPress: () => {
-                            if (mapRef.current) {
+                            if (mapRef.current && Platform.OS !== 'web') {
                                 mapRef.current.animateToRegion({
                                     latitude: data.latitude,
                                     longitude: data.longitude,
@@ -201,7 +202,7 @@ export default function MapScreen({ navigation }) {
     };
 
     const centerOnUser = () => {
-        if (currentLocation && mapRef.current) {
+        if (currentLocation && mapRef.current && Platform.OS !== 'web') {
             mapRef.current.animateToRegion({
                 latitude: currentLocation.latitude,
                 longitude: currentLocation.longitude,
@@ -216,6 +217,49 @@ export default function MapScreen({ navigation }) {
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#FF6B6B" />
                 <Text style={styles.loadingText}>Loading map...</Text>
+            </View>
+        );
+    }
+
+    // WEB FALLBACK
+    if (Platform.OS === 'web') {
+        return (
+            <View style={styles.container}>
+                <View style={styles.loadingContainer}>
+                    <Ionicons name="map-outline" size={64} color="#ccc" />
+                    <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20, color: '#333' }}>Map View Not Available on Web</Text>
+                    <Text style={{ marginTop: 10, color: '#666', textAlign: 'center', paddingHorizontal: 20 }}>
+                        Please use the mobile app for full map functionality and location tracking.
+                    </Text>
+                </View>
+
+                {/* Top Control Panel - Kept for navigation */}
+                <View style={styles.topControls}>
+                    <TouchableOpacity
+                        style={styles.menuButton}
+                        onPress={() => navigation.navigate('EmergencyContacts')}
+                    >
+                        <Ionicons name="list" size={24} color="#333" />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.menuButton}
+                        onPress={() => navigation.navigate('SOSHistory')}
+                    >
+                        <Ionicons name="time" size={24} color="#333" />
+                    </TouchableOpacity>
+                </View>
+
+                {/* SOS Button - Kept for web too */}
+                <TouchableOpacity
+                    style={[styles.sosButton, showSOS && styles.sosButtonActive]}
+                    onPress={handleSOSPress}
+                    onLongPress={() => setShowSOS(true)}
+                    activeOpacity={0.8}
+                >
+                    <Text style={styles.sosText}>SOS</Text>
+                    <Text style={styles.sosSubtext}>HOLD FOR EMERGENCY</Text>
+                </TouchableOpacity>
             </View>
         );
     }
@@ -311,10 +355,10 @@ export default function MapScreen({ navigation }) {
             {/* Status Bar */}
             <View style={styles.statusBar}>
                 <View style={styles.statusItem}>
-                    <Ionicons 
-                        name={isTracking ? "radio-button-on" : "radio-button-off"} 
-                        size={12} 
-                        color={isTracking ? "#4CAF50" : "#999"} 
+                    <Ionicons
+                        name={isTracking ? "radio-button-on" : "radio-button-off"}
+                        size={12}
+                        color={isTracking ? "#4CAF50" : "#999"}
                     />
                     <Text style={styles.statusText}>
                         {isTracking ? 'Tracking' : 'Not Tracking'}
