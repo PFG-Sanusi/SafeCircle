@@ -120,26 +120,30 @@ export default function App() {
 
                 const permissions = async () => {
                     if (Platform.OS === 'web') {
-                        console.log('Web platform detected, skipping blocking permissions');
+                        console.log('Web platform detected, skipping permissions');
                         return;
                     }
 
-                    // Request foreground location permissions
-                    const { status: fgStatus } = await Location.requestForegroundPermissionsAsync();
-                    if (fgStatus !== 'granted') {
-                        console.warn('Foreground location permission not granted');
-                    }
+                    try {
+                        // Request foreground location permissions
+                        const { status: fgStatus } = await Location.requestForegroundPermissionsAsync();
+                        if (fgStatus !== 'granted') {
+                            console.warn('Foreground location permission not granted');
+                        }
 
-                    // Request background location permissions
-                    const { status: bgStatus } = await Location.requestBackgroundPermissionsAsync();
-                    if (bgStatus !== 'granted') {
-                        console.warn('Background location permission not granted');
-                    }
+                        // Request background location permissions
+                        const { status: bgStatus } = await Location.requestBackgroundPermissionsAsync();
+                        if (bgStatus !== 'granted') {
+                            console.warn('Background location permission not granted');
+                        }
 
-                    // Request notification permissions
-                    const { status: notifStatus } = await Notifications.requestPermissionsAsync();
-                    if (notifStatus !== 'granted') {
-                        console.warn('Notification permission not granted');
+                        // Request notification permissions
+                        const { status: notifStatus } = await Notifications.requestPermissionsAsync();
+                        if (notifStatus !== 'granted') {
+                            console.warn('Notification permission not granted');
+                        }
+                    } catch (error) {
+                        console.error('Permission request error:', error);
                     }
                 };
 

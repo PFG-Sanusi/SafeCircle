@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
+import { Platform } from 'react-native';
 import * as Location from 'expo-location';
 import { useAuth } from './AuthContext';
 import { useSocket } from './SocketContext';
@@ -22,6 +23,12 @@ export const LocationProvider = ({ children }) => {
 
     const startTracking = async () => {
         try {
+            // Skip location tracking on web
+            if (Platform.OS === 'web') {
+                console.log('Location tracking not available on web');
+                return;
+            }
+
             const { status } = await Location.requestForegroundPermissionsAsync();
 
             if (status !== 'granted') {
@@ -76,6 +83,12 @@ export const LocationProvider = ({ children }) => {
 
     const getCurrentLocation = async () => {
         try {
+            // Return null on web
+            if (Platform.OS === 'web') {
+                console.log('Location not available on web');
+                return null;
+            }
+
             const location = await Location.getCurrentPositionAsync({
                 accuracy: Location.Accuracy.High
             });
