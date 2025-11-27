@@ -2,7 +2,7 @@
 
 **Real-time location tracking and SOS emergency alerts for iOS & Android**
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 - Node.js 18+ installed
@@ -66,7 +66,7 @@ SafeCircle/
     └── schema.sql
 ```
 
-## 🔧 Configuration
+##  Configuration
 
 ### Backend Environment Variables
 Create `backend/.env`:
@@ -86,7 +86,7 @@ extra: {
 }
 ```
 
-## 🚀 Running the App
+##  Running the App
 
 ### Backend
 ```bash
@@ -106,7 +106,7 @@ npm start            # Start Expo
 # - Scan QR code with Expo Go app
 ```
 
-## 🌟 Key Features
+##  Key Features
 
 - ✅ Real-time GPS location tracking
 - ✅ SOS emergency alerts
@@ -119,7 +119,7 @@ npm start            # Start Expo
 - ✅ Socket.IO real-time updates
 - ✅ JWT authentication
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 **Backend:**
 - Node.js + Express
@@ -138,7 +138,7 @@ npm start            # Start Expo
 - PostgreSQL with PostGIS extension
 - Hosted on Supabase (free tier available)
 
-## 📚 API Documentation
+##  API Documentation
 
 ### Authentication
 - `POST /api/auth/register` - Register new user
@@ -173,7 +173,7 @@ npm start            # Start Expo
 - `PUT /api/emergency-contacts/:id` - Update contact
 - `DELETE /api/emergency-contacts/:id` - Delete contact
 
-## 🔒 Security
+##  Security
 
 - JWT token-based authentication
 - Password hashing with bcryptjs
@@ -182,11 +182,11 @@ npm start            # Start Expo
 - Input validation
 - SQL injection protection (Supabase)
 
-## 📝 License
+##  License
 
 MIT License - see LICENSE file
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
@@ -198,5 +198,3 @@ For issues or questions:
 3. Contact: your-email@example.com
 
 ---
-
-**Built with ❤️ for keeping people safe**
